@@ -1,0 +1,40 @@
+/* Tailwind source file. Build with:
+   npx tailwindcss -i css/input.css -o css/tailwind.css --minify */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .nav-link { @apply px-3 py-2 rounded-lg text-slate-600 hover:text-indigo-700 hover:bg-indigo-50 transition; }
+  .nav-link.active { @apply text-indigo-700 bg-indigo-50; }
+  .card { @apply bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6; }
+  .card-title { @apply font-semibold text-lg text-slate-900; }
+  .btn { @apply inline-flex items-center justify-center gap-1 rounded-xl font-semibold px-5 py-2.5 transition disabled:opacity-40 disabled:cursor-not-allowed; }
+  .btn-sm { @apply px-3 py-2 text-sm; }
+  .btn-primary { @apply bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm; }
+  .btn-ghost { @apply bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:border-slate-400; }
+  .input { @apply w-full mt-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400; }
+  .field-label { @apply text-sm font-medium text-slate-700 mb-2; }
+  .mini-label { @apply text-xs text-slate-500 mt-2; }
+  .info-chip { @apply bg-white/80 border border-slate-200 rounded-xl px-4 py-3; }
+  .info-chip dt { @apply text-xs text-slate-500; }
+  .info-chip dd { @apply font-semibold text-slate-900; }
+  .badge { @apply inline-block text-xs font-semibold px-2.5 py-1 rounded-full; }
+  .badge-slate { @apply bg-slate-100 text-slate-600; }
+  .badge-indigo { @apply bg-indigo-100 text-indigo-700; }
+  .badge-green { @apply bg-emerald-100 text-emerald-700; }
+  .badge-red { @apply bg-rose-100 text-rose-700; }
+  .badge-amber { @apply bg-amber-100 text-amber-800; }
+  .link { @apply text-indigo-600 font-medium hover:underline; }
+  .msg { @apply text-sm; }
+  .stat { @apply bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5; }
+  .stat-label { @apply text-xs text-slate-500; }
+  .stat-value { @apply text-lg font-bold text-slate-900 tabular-nums; }
+  .node-box { @apply flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl p-3 min-h-[5.5rem]; }
+  .cmp-table { @apply w-full text-sm text-left; }
+  .cmp-table th { @apply font-semibold text-slate-600 bg-slate-50 px-3 py-2.5 border-b border-slate-200 whitespace-nowrap; }
+  .cmp-table td { @apply px-3 py-2.5 border-b border-slate-100 whitespace-nowrap tabular-nums; }
+  .prose-simple p { @apply mt-3 text-slate-700 leading-relaxed; }
+  .prose-simple ul { @apply mt-3 space-y-1.5 list-disc pl-5 text-slate-700; }
+  .steps-list { @apply mt-3 space-y-2 list-decimal pl-5 text-sm text-slate-700; }
+}

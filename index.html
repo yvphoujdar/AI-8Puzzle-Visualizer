@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>8-Puzzle Search Visualizer | Yash Phoujdar</title>
+  <meta name="description" content="Interactive 8-Puzzle solver that visualises BFS, DFS, DLS, IDDLS, Uniform Cost Search, Greedy Best First Search and A*." />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tailwind.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- ===================== Navigation ===================== -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
+    <nav class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="#home" class="flex items-center gap-2 font-bold text-slate-900">
+        <img src="assets/favicon.svg" alt="" class="w-8 h-8" />
+        <span>8-Puzzle Visualizer</span>
+      </a>
+      <button id="menuBtn" class="md:hidden p-2 rounded-lg hover:bg-slate-100" aria-label="Open menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <ul id="navLinks" class="hidden md:flex gap-1 text-sm font-medium">
+        <li><a href="#home" class="nav-link">Home</a></li>
+        <li><a href="#solver" class="nav-link">Solver</a></li>
+        <li><a href="#compare" class="nav-link">Comparison</a></li>
+        <li><a href="#algorithms" class="nav-link">Algorithms</a></li>
+      </ul>
+    </nav>
+    <ul id="mobileNav" class="md:hidden hidden px-4 pb-3 space-y-1 text-sm font-medium">
+      <li><a href="#home" class="nav-link block">Home</a></li>
+      <li><a href="#solver" class="nav-link block">Solver</a></li>
+      <li><a href="#compare" class="nav-link block">Comparison</a></li>
+      <li><a href="#algorithms" class="nav-link block">Algorithms</a></li>
+    </ul>
+  </header>
+
+  <main class="flex-1">
+
+    <!-- ===================== HOME ===================== -->
+    <section id="view-home" class="view">
+      <div class="bg-gradient-to-br from-indigo-50 via-white to-amber-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 py-12 md:py-16 grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <p class="text-sm font-semibold text-indigo-600 tracking-wide uppercase">Artificial Intelligence &middot; Digital Assignment (Case Study)</p>
+            <h1 class="mt-3 text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight">Interactive 8-Puzzle Problem Solver using AI Search Algorithms</h1>
+            <p class="mt-4 text-slate-600 text-lg">Pick a puzzle, pick an algorithm, and watch how it searches for the answer one step at a time.</p>
+
+            <dl class="mt-6 grid grid-cols-2 gap-3 max-w-lg">
+              <div class="info-chip"><dt>Course</dt><dd>Artificial Intelligence</dd></div>
+              <div class="info-chip"><dt>Student</dt><dd>Yash Phoujdar</dd></div>
+              <div class="info-chip"><dt>Registration No.</dt><dd>24BCE2152</dd></div>
+              <div class="info-chip"><dt>Assigned algorithm</dt><dd>5 &middot; Uniform Cost Search</dd></div>
+            </dl>
+
+            <div class="mt-8 flex flex-wrap gap-3">
+              <a href="#solver" class="btn btn-primary">Open the Solver</a>
+              <a href="#compare" class="btn btn-ghost">Compare algorithms</a>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-center">
+            <div id="heroBoard" class="board w-64 h-64 md:w-72 md:h-72"></div>
+            <p id="heroCaption" class="mt-4 text-sm text-slate-500">Solving the example puzzle&hellip;</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-4 py-12 grid lg:grid-cols-3 gap-8">
+        <article class="lg:col-span-2 card">
+          <h2 class="card-title text-2xl">What is the 8-Puzzle?</h2>
+          <div class="prose-simple">
+            <p>The 8-puzzle is a small sliding puzzle. It has a 3&times;3 board with eight numbered tiles and one empty square (the <b>blank</b>). A tile next to the blank can slide into it. The aim is to slide tiles until the board matches a given <b>goal</b> arrangement.</p>
+            <p>It is a classic example in AI because it is easy to understand but still needs a proper search to solve. We can describe it as a <b>state-space search problem</b>:</p>
+            <ul>
+              <li><b>State:</b> where each of the 8 tiles and the blank are on the board.</li>
+              <li><b>Initial state:</b> the board we start with.</li>
+              <li><b>Actions:</b> move the blank <i>Up</i>, <i>Down</i>, <i>Left</i> or <i>Right</i> (only if it stays on the board). So each state has 2, 3 or 4 next states.</li>
+              <li><b>Goal test:</b> does the board match the goal board?</li>
+              <li><b>Path cost:</b> normally each move costs 1, so the cost is the number of moves. This site also lets you make a move cost the number on the tile you slide, which shows where Uniform Cost Search really matters.</li>
+            </ul>
+            <p>There are 9! = 362,880 ways to arrange the board, but only half of them (181,440) can be reached from any given start. A quick check tells us if a puzzle can be solved: count the pairs of tiles that are in the wrong order (the <b>inversions</b>). A move never changes whether this count is even or odd, so the start and goal must have the same &ldquo;evenness&rdquo;. The hardest puzzles need 31 moves.</p>
+          </div>
+        </article>
+
+        <aside class="card">
+          <h3 class="card-title">The example from the question</h3>
+          <div class="flex items-center justify-around gap-4 mt-4">
+            <div class="text-center"><div id="homeStart"></div><p class="mini-label">Initial state</p></div>
+            <span class="text-2xl text-slate-400">&rarr;</span>
+            <div class="text-center"><div id="homeGoal"></div><p class="mini-label">Goal state</p></div>
+          </div>
+          <p class="text-sm text-slate-600 mt-5">This one can be solved in just 5 moves. Try it on the Solver page and see how many states each algorithm has to look at before it finds those 5 moves.</p>
+          <h3 class="card-title mt-8">Using this site</h3>
+          <ol class="steps-list">
+            <li><a href="#solver" class="link">Solver</a> &ndash; enter or generate a puzzle, pick an algorithm and press Run.</li>
+            <li><a href="#compare" class="link">Comparison</a> &ndash; run all algorithms on the same puzzle side by side.</li>
+            <li><a href="#algorithms" class="link">Algorithms</a> &ndash; how each one works, its pros, cons and complexity.</li>
+          </ol>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===================== SOLVER ===================== -->
+    <section id="view-solver" class="view hidden">
+      <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="mb-6">
+          <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Puzzle Solver</h1>
+          <p class="text-slate-600 mt-1">Set up a puzzle on the left, then use the controls to play the search step by step.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-6">
+          <!-- ---------- Left: input, algorithm, controls ---------- -->
+          <div class="lg:col-span-4 space-y-6">
+            <div class="card">
+              <h2 class="card-title">1. Puzzle input</h2>
+              <p class="text-xs text-slate-500 mt-1">Type the digits 1&ndash;8 and leave one box empty (or type 0 / _) for the blank.</p>
+              <div class="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <p class="field-label">Initial state</p>
+                  <div id="startGrid" class="edit-grid"></div>
+                </div>
+                <div>
+                  <p class="field-label">Goal state</p>
+                  <div id="goalGrid" class="edit-grid"></div>
+                </div>
+              </div>
+              <p id="inputMsg" class="msg mt-3"></p>
+              <div class="mt-4 grid grid-cols-2 gap-2">
+                <button id="btnExample" class="btn btn-ghost btn-sm">Use example</button>
+                <button id="btnRandom" class="btn btn-ghost btn-sm">Generate Random Puzzle</button>
+              </div>
+              <label class="field-label mt-3 block" for="difficulty">Random puzzle difficulty</label>
+              <select id="difficulty" class="input">
+                <option value="8">Easy (about 8 moves)</option>
+                <option value="14" selected>Medium (about 14 moves)</option>
+                <option value="24">Hard (about 20+ moves)</option>
+              </select>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">2. Algorithm</h2>
+              <label class="field-label mt-3 block" for="algo">Search algorithm</label>
+              <select id="algo" class="input">
+                <optgroup label="Uninformed search">
+                  <option value="bfs">Breadth First Search (BFS)</option>
+                  <option value="dfs">Depth First Search (DFS)</option>
+                  <option value="dls">Depth Limited Search (DLS)</option>
+                  <option value="iddls">Iterative Deepening DLS (IDDLS)</option>
+                  <option value="ucs" selected>Uniform Cost Search (UCS) &mdash; assigned</option>
+                </optgroup>
+                <optgroup label="Informed search">
+                  <option value="gbfs">Greedy Best First Search (GBFS)</option>
+                  <option value="astar">A* Search</option>
+                </optgroup>
+              </select>
+              <p id="algoHint" class="text-xs text-slate-500 mt-2"></p>
+
+              <div id="dlsBox" class="mt-3 hidden">
+                <label class="field-label block" for="depthLimit">Depth limit (l)</label>
+                <input id="depthLimit" type="number" min="0" max="40" value="10" class="input" />
+              </div>
+              <div id="iddlsBox" class="mt-3 hidden">
+                <label class="field-label block" for="maxDepth">Maximum depth to try</label>
+                <input id="maxDepth" type="number" min="1" max="40" value="31" class="input" />
+              </div>
+              <div id="heuristicBox" class="mt-3 hidden">
+                <label class="field-label block" for="heuristic">Heuristic h(n)</label>
+                <select id="heuristic" class="input">
+                  <option value="manhattan">Manhattan Distance</option>
+                  <option value="misplaced">Misplaced Tiles</option>
+                </select>
+              </div>
+              <label class="field-label mt-3 block" for="costModel">Cost of a move</label>
+              <select id="costModel" class="input">
+                <option value="unit">Every move costs 1</option>
+                <option value="tile">Move cost = number on the tile</option>
+              </select>
+              <p class="text-xs text-slate-500 mt-2">With &ldquo;every move costs 1&rdquo;, UCS behaves like BFS. With tile costs, UCS finds the <i>cheapest</i> path, which may not be the shortest.</p>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">3. Controls</h2>
+              <div class="grid grid-cols-3 gap-2 mt-4">
+                <button id="btnRun" class="btn btn-primary btn-sm col-span-3">&#9654; Run</button>
+                <button id="btnPause" class="btn btn-ghost btn-sm">Pause</button>
+                <button id="btnResume" class="btn btn-ghost btn-sm">Resume</button>
+                <button id="btnReset" class="btn btn-ghost btn-sm">Reset</button>
+                <button id="btnPrev" class="btn btn-ghost btn-sm">&larr; Previous Step</button>
+                <button id="btnNext" class="btn btn-ghost btn-sm col-span-2">Next Step &rarr;</button>
+                <button id="btnSkip" class="btn btn-ghost btn-sm col-span-3">Skip to solution</button>
+              </div>
+              <label class="field-label mt-4 flex justify-between" for="speed"><span>Change Speed</span><span id="speedLabel" class="text-slate-500"></span></label>
+              <input id="speed" type="range" min="1" max="10" value="5" class="w-full accent-indigo-600" />
+              <p class="text-xs text-slate-400 mt-2">Keyboard: Space = pause/resume, &larr; / &rarr; = previous / next step.</p>
+            </div>
+          </div>
+
+          <!-- ---------- Right: visualisation ---------- -->
+          <div class="lg:col-span-8 space-y-6">
+            <div class="card">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 class="card-title">Puzzle visualisation</h2>
+                <span id="phaseBadge" class="badge badge-slate">Ready</span>
+              </div>
+              <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-6 items-center">
+                <div class="text-center order-2 sm:order-1"><div id="viewStart" class="inline-block"></div><p class="mini-label">Initial state</p></div>
+                <div class="flex flex-col items-center order-1 sm:order-2">
+                  <div id="mainBoard" class="board w-52 h-52 md:w-60 md:h-60"></div>
+                  <p class="mini-label">Current state</p>
+                </div>
+                <div class="text-center order-3"><div id="viewGoal" class="inline-block"></div><p class="mini-label">Goal state</p></div>
+              </div>
+              <p id="statusText" class="mt-5 text-center text-slate-700 min-h-[1.5rem]"></p>
+              <div class="mt-3 h-2 bg-slate-100 rounded-full overflow-hidden"><div id="progressBar" class="h-full bg-indigo-500 transition-all" style="width:0%"></div></div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">Search process</h2>
+              <div id="statsGrid" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+
+              <div class="mt-6 grid sm:grid-cols-2 gap-6">
+                <div>
+                  <p class="field-label">Current node being expanded</p>
+                  <div id="currentNode" class="node-box"></div>
+                </div>
+                <div>
+                  <p class="field-label">Parent node</p>
+                  <div id="parentNode" class="node-box"></div>
+                </div>
+              </div>
+
+              <p class="field-label mt-6">Generated successor states</p>
+              <div id="successors" class="flex flex-wrap gap-3"></div>
+
+              <p class="field-label mt-6">Frontier (open list) <span id="frontierNote" class="font-normal text-slate-400"></span></p>
+              <div id="frontier" class="flex flex-wrap gap-3"></div>
+
+              <p class="field-label mt-6">Explored (closed list) <span id="exploredNote" class="font-normal text-slate-400"></span></p>
+              <div id="explored" class="flex flex-wrap gap-3"></div>
+            </div>
+
+            <div id="summaryCard" class="card hidden">
+              <div class="flex items-center justify-between">
+                <h2 class="card-title">Solution summary</h2>
+                <span id="summaryBadge" class="badge"></span>
+              </div>
+              <div id="summaryGrid" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+              <p id="summaryNote" class="text-xs text-slate-500 mt-3"></p>
+            </div>
+
+            <div id="pathCard" class="card hidden">
+              <h2 class="card-title">Final solution path</h2>
+              <p id="pathNote" class="text-xs text-slate-500 mt-1"></p>
+              <div id="pathList" class="mt-4 flex gap-2 overflow-x-auto pb-3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== COMPARISON ===================== -->
+    <section id="view-compare" class="view hidden">
+      <div class="max-w-7xl mx-auto px-4 py-8 space-y-6">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Comparison of all algorithms</h1>
+          <p class="text-slate-600 mt-1">Every algorithm is run on the <b>same puzzle</b> (the one set on the Solver page), and the results are put side by side.</p>
+        </div>
+
+        <div class="card grid md:grid-cols-12 gap-6 items-end">
+          <div class="md:col-span-4 flex items-center gap-4">
+            <div class="text-center"><div id="cmpStart"></div><p class="mini-label">Initial</p></div>
+            <span class="text-xl text-slate-400">&rarr;</span>
+            <div class="text-center"><div id="cmpGoal"></div><p class="mini-label">Goal</p></div>
+          </div>
+          <div class="md:col-span-2">
+            <label class="field-label block" for="cmpHeuristic">Heuristic (GBFS, A*)</label>
+            <select id="cmpHeuristic" class="input">
+              <option value="manhattan">Manhattan</option>
+              <option value="misplaced">Misplaced Tiles</option>
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <label class="field-label block" for="cmpLimit">DLS depth limit</label>
+            <input id="cmpLimit" type="number" min="0" max="40" value="10" class="input" />
+          </div>
+          <div class="md:col-span-2">
+            <label class="field-label block" for="cmpCost">Move cost</label>
+            <select id="cmpCost" class="input">
+              <option value="unit">Every move = 1</option>
+              <option value="tile">Tile number</option>
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <button id="btnCompare" class="btn btn-primary w-full">Run comparison</button>
+          </div>
+        </div>
+
+        <div class="card overflow-x-auto">
+          <table class="cmp-table">
+            <thead>
+              <tr>
+                <th>Algorithm</th><th>Solution Found</th><th>Moves</th><th>Path Cost</th>
+                <th>Nodes Expanded</th><th>Nodes Generated</th><th>Max Depth</th><th>Time</th><th>Memory</th>
+              </tr>
+            </thead>
+            <tbody id="cmpBody"></tbody>
+          </table>
+          <p class="text-xs text-slate-500 mt-3">Time is measured in your browser, so it changes a little from run to run. Memory is an estimate: the most nodes stored at once &times; about 160 bytes per node.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="card">
+            <h2 class="card-title">Nodes expanded</h2>
+            <p class="text-xs text-slate-500">Bar length uses a log scale so small and huge numbers both fit.</p>
+            <div id="chartNodes" class="mt-4 space-y-2"></div>
+          </div>
+          <div class="card">
+            <h2 class="card-title">What to notice</h2>
+            <ul id="cmpNotes" class="list-disc pl-5 space-y-2 text-sm text-slate-700 mt-3"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ALGORITHM INFO ===================== -->
+    <section id="view-algorithms" class="view hidden">
+      <div class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Algorithm information</h1>
+          <p class="text-slate-600 mt-1">Short notes on every algorithm used in this project. Symbols: <b>b</b> = branching factor (at most 4 here, about 2.7 on average), <b>d</b> = depth of the shallowest solution, <b>m</b> = maximum depth, <b>l</b> = depth limit, <b>C*</b> = cost of the cheapest solution, <b>&epsilon;</b> = smallest move cost.</p>
+        </div>
+        <div id="algoCards" class="grid md:grid-cols-2 gap-6"></div>
+
+        <div class="card">
+          <h2 class="card-title text-xl">Heuristics used (for GBFS and A*)</h2>
+          <div id="heuristicInfo" class="mt-4 grid md:grid-cols-2 gap-6"></div>
+        </div>
+
+        <div class="card overflow-x-auto">
+          <h2 class="card-title text-xl">Quick summary</h2>
+          <table class="cmp-table mt-4">
+            <thead><tr><th>Algorithm</th><th>Data structure</th><th>Complete?</th><th>Optimal?</th><th>Time</th><th>Space</th></tr></thead>
+            <tbody id="summaryTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white">
+    <div class="max-w-7xl mx-auto px-4 py-6 text-sm text-slate-500 flex flex-wrap justify-between gap-2">
+      <span>Yash Phoujdar &middot; 24BCE2152 &middot; Artificial Intelligence Digital Assignment</span>
+      <span>Built with HTML5, Tailwind CSS and JavaScript (ES6)</span>
+    </div>
+  </footer>
+
+  <script src="js/puzzle.js"></script>
+  <script src="js/algorithms.js"></script>
+  <script src="js/info.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
